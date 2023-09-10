@@ -1,0 +1,81 @@
+#!/bin/bash
+
+BASICS=(zsh git tmux stow curl mosh make cmake)
+BUILD_TOOLS=(make cmake build-essential libssl-dev zlib1g-dev libbz2-dev libreadline-dev libsqlite3-dev wget llvm \
+  libncursesw5-dev xz-utils tk-dev libxml2-dev libxmlsec1-dev libffi-dev liblzma-dev)
+TMUX_TOOLS=(tmux-mem-cpu-load)
+# Do not install asdf's python-3.11.5 since it requires full compilation
+# some work is being done to make a standalone though: https://github.com/jdx/rtx/issues/559
+ASDF=(neovim-stable nodejs-20.5.1)
+STOW=(zsh git tmux lvim)
+# Do not install PERSONAL_TOOLS, they're just here for reference
+PERSONAL_TOOLS=(pass)
+
+
+cecho(){
+    RED="\033[0;31m"
+    GREEN="\033[0;32m"  # <-- [0 means not bold
+    YELLOW="\033[1;33m" # <-- [1 means bold
+    CYAN="\033[1;36m"
+
+    NC="\033[0m" # No Color
+
+    printf "${!1}${2} ${NC}\n" # <-- bash
+}
+
+function ask_yes_or_no() {
+    read -p "$1 ([y]es or [N]o): "
+    case $(echo $REPLY | tr '[A-Z]' '[a-z]') in
+        y|yes) echo "yes" ;;
+        *)     echo "no" ;;
+    esac
+}
+
+cecho "GREEN" "Updating APT"
+apt update
+
+cecho "GREEN" "Installing Basics: ${BASICS[@]}"
+apt -y install ${BASICS[@]}
+
+if [[ $(ask_yes_or_no "Install Starship?") == "yes" ]] then
+  cecho "GREEN" "Installing Starship"
+  curl -sS https://starship.rs/install.sh | sh
+fi
+
+if [[ $(ask_yes_or_no "Install Build Tools? ${BUILD_TOOLS[@]}") == "yes" ]] then
+  cecho "GREEN" "Installing Build Tools: ${BUILD_TOOLS[@]}"
+  apt -y install ${BUILD_TOOLS[@]}
+fi
+
+if [[ $(ask_yes_or_no "Install ASDF?") == "yes" ]] then
+  cecho "GREEN" "Installing ASDF"
+  git clone https://github.com/asdf-vm/asdf.git ~/.asdf --branch v0.12.0
+  . "$HOME/.asdf/asdf.sh"
+fi
+
+if [[ $(ask_yes_or_no "Install ASDF packages? ${ASDF[@]}") == "yes" ]] then
+  cecho "GREEN" "Installing ASDF packages: ${ASDF[@]}"
+  for package in "${ASDF[@]}"
+  do
+    IFS='-' read -ra package_and_version <<<"$package"
+    dep="${package_and_version[0]}"
+    version="${package_and_version[1]}"
+    asdf plugin add $dep
+    asdf install $dep $version
+    asdf global $dep $version
+  done
+fi
+
+if [[ $(ask_yes_or_no "Install LunarVim?") == "yes" ]] then
+  cecho "GREEN" "Installing LunarVim"
+  LV_BRANCH='release-1.3/neovim-0.9' bash <(curl -s https://raw.githubusercontent.com/LunarVim/LunarVim/release-1.3/neovim-0.9/utils/installer/install.sh)
+fi
+
+cecho "GREEN" "Installing tmux plugin manager"
+git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
+apt -y install ${TMUX_TOOLS[@]}
+
+cecho "GREEN" "Changing default shell to zsh"
+chsh -s $(which zsh)
+
+stow $STOW
