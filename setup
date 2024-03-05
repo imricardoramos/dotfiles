@@ -2,11 +2,11 @@
 
 BASICS=(zsh git tmux stow curl mosh exa jq make cmake kitty-terminfo)
 BUILD_TOOLS=(make cmake build-essential libssl-dev zlib1g-dev libbz2-dev libreadline-dev libsqlite3-dev wget llvm \
-  libncursesw5-dev xz-utils tk-dev libxml2-dev libxmlsec1-dev libffi-dev liblzma-dev)
+  libncursesw5-dev xz-utils tk-dev libxml2-dev libxmlsec1-dev libffi-dev liblzma-dev pip)
 TMUX_TOOLS=(tmux-mem-cpu-load)
 # Do not install asdf's python-3.11.5 since it requires full compilation
 # some work is being done to make a standalone though: https://github.com/jdx/rtx/issues/559
-ASDF=(neovim-stable nodejs-20.5.1)
+ASDF=(neovim-stable nodejs-20.5.1 rust-1.76.0)
 STOW=(zsh git tmux lvim)
 # Do not install PERSONAL_TOOLS, they're just here for reference
 PERSONAL_TOOLS=(pass)
@@ -32,19 +32,19 @@ function ask_yes_or_no() {
 }
 
 cecho "GREEN" "Updating APT"
-apt update
+sudo apt update
 
 cecho "GREEN" "Installing Basics: ${BASICS[@]}"
-apt -y install ${BASICS[@]}
+sudo apt -y install ${BASICS[@]}
 
 if [[ $(ask_yes_or_no "Install Starship?") == "yes" ]] then
   cecho "GREEN" "Installing Starship"
-  curl -sS https://starship.rs/install.sh | sh
+  curl -sS https://starship.rs/install.sh | sudo sh
 fi
 
 if [[ $(ask_yes_or_no "Install Build Tools? ${BUILD_TOOLS[@]}") == "yes" ]] then
   cecho "GREEN" "Installing Build Tools: ${BUILD_TOOLS[@]}"
-  apt -y install ${BUILD_TOOLS[@]}
+  sudo apt -y install ${BUILD_TOOLS[@]}
 fi
 
 if [[ $(ask_yes_or_no "Install ASDF?") == "yes" ]] then
@@ -73,9 +73,9 @@ fi
 
 cecho "GREEN" "Installing tmux plugin manager"
 git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
-apt -y install ${TMUX_TOOLS[@]}
+sudo apt -y install ${TMUX_TOOLS[@]}
 
 cecho "GREEN" "Changing default shell to zsh"
-chsh -s $(which zsh)
+sudo chsh -s $(which zsh) $(whoami)
 
 stow $STOW
