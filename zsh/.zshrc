@@ -15,7 +15,8 @@ fi
 source "$HOME/.local/share/zinit/zinit.git/zinit.zsh"
 autoload -Uz _zinit
 (( ${+_comps} )) && _comps[zinit]=_zinit
-autoload -Uz compinit && compinit
+autoload -Uz compinit
+compinit
 
 # Base16 Shell
 BASE16_SHELL="$HOME/.config/base16-shell/"
@@ -35,6 +36,7 @@ eval "$(starship init zsh)"
 
 # ASDF
 . "$HOME/.asdf/asdf.sh"
+export PATH="$HOME/.asdf/installs/python/3.11.5/bin/:$PATH"
 
 # Colored Man Pages
 export LESS_TERMCAP_md=$(tput bold; tput setaf 2)
@@ -80,6 +82,9 @@ fi
 export GPG_TTY=$(tty)
 gpg-connect-agent updatestartuptty /bye >/dev/null
 
+# Java
+. ~/.asdf/plugins/java/set-java-home.zsh
+
 # END PERSONAL STUFF
 
 # Aliases
@@ -87,8 +92,13 @@ alias cp="cp -i"                                                # Confirm before
 alias df='df -h'                                                # Human-readable sizes
 alias gitu='git add . && git commit && git push'
 alias vlc='vlc -I dummy'
+alias ls='exa'
 alias ll='ls -al --color=always'
 alias dc='docker-compose'
 alias vim='lvim'
 alias vimdiff='lvim -d'
 alias ag='ag --ignore-dir node_modules --ignore-dir .git --ignore-dir _build'
+export PATH="/opt/homebrew/opt/llvm/bin:$PATH"
+
+# Completions
+export PATH="/opt/homebrew/opt/postgresql@15/bin:$PATH"

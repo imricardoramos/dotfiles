@@ -12,9 +12,13 @@ an executable
 lvim.log.level = "warn"
 lvim.format_on_save.enabled = false
 lvim.colorscheme = "monokai"
+vim.opt.conceallevel = 2
+vim.opt.concealcursor = "nc"
 -- to disable icons and use a minimalist setup, uncomment the following
 -- lvim.use_icons = false
 
+-- Disable autopairing parens, brackets, quotes, etc
+lvim.builtin.autopairs.active = false
 -- keymappings [view all the defaults by pressing <leader>Lk]
 lvim.leader = "space"
 -- add your own keymapping
@@ -163,13 +167,143 @@ lvim.builtin.treesitter.highlight.enable = true
 -- }
 
 -- Additional Plugins
+vim.list_extend(lvim.lsp.automatic_configuration.skipped_servers, { "rust_analyzer" })
 lvim.plugins = {
   { 'tanvirtin/monokai.nvim',
     config = function()
       require('monokai').setup {}
     end,
-  }
+  },
+  {"nvim-neotest/neotest",
+    dependencies = {
+      "nvim-lua/plenary.nvim",
+      "antoinemadec/FixCursorHold.nvim",
+      "nvim-treesitter/nvim-treesitter",
+      "jfpedroza/neotest-elixir"
+    },
+    config = function()
+      require("neotest").setup({
+        adapters = {
+          require("neotest-elixir")
+        }
+      })
+    end
+  },
+  {
+    'nvim-orgmode/orgmode',
+    dependencies = {
+      { 'nvim-treesitter/nvim-treesitter', lazy = true },
+    },
+    event = 'VeryLazy',
+    config = function()
+      -- Load treesitter grammar for org
+      require('orgmode').setup_ts_grammar()
+
+      -- Setup treesitter
+      require('nvim-treesitter.configs').setup({
+        highlight = {
+          enable = true,
+          additional_vim_regex_highlighting = { 'org' },
+        },
+        ensure_installed = { 'org' },
+      })
+
+      -- Setup orgmode
+      require('orgmode').setup({
+        org_hide_emphasis_markers = true,
+        org_agenda_files = '~/Sync/org/*',
+        org_default_notes_file = '~/Sync/org/inbox.org',
+      })
+    end,
+  },
+  {'akinsho/org-bullets.nvim', config = function()
+    require('org-bullets').setup()
+  end
+  },
+  {'tpope/vim-fugitive'},
+  {'tpope/vim-rhubarb'},
+  { "folke/trouble.nvim",
+   dependencies = { "nvim-tree/nvim-web-devicons" },
+   opts = {},
+  },
+  {
+   "simrat39/rust-tools.nvim",
+    -- ft = { "rust", "rs" }, -- IMPORTANT: re-enabling this seems to break inlay-hints
+    config = function()
+      require("rust-tools").setup {
+        tools = {
+          executor = require("rust-tools/executors").termopen, -- can be quickfix or termopen
+          reload_workspace_from_cargo_toml = true,
+          inlay_hints = {
+            auto = true,
+            only_current_line = false,
+            show_parameter_hints = true,
+            parameter_hints_prefix = "<-",
+            other_hints_prefix = "=>",
+            max_len_align = false,
+            max_len_align_padding = 1,
+            right_align = false,
+            right_align_padding = 7,
+            highlight = "Comment",
+          },
+          hover_actions = {
+            border = {
+              { "╭", "FloatBorder" },
+              { "─", "FloatBorder" },
+              { "╮", "FloatBorder" },
+              { "│", "FloatBorder" },
+              { "╯", "FloatBorder" },
+              { "─", "FloatBorder" },
+              { "╰", "FloatBorder" },
+              { "│", "FloatBorder" },
+            },
+            auto_focus = true,
+          },
+        },
+        server = {
+          on_init = require("lvim.lsp").common_on_init,
+          on_attach = function(client, bufnr)
+            require("lvim.lsp").common_on_attach(client, bufnr)
+            local rt = require "rust-tools"
+            -- Hover actions
+            vim.keymap.set("n", "<C-space>", rt.hover_actions.hover_actions, { buffer = bufnr })
+            -- Code action groups
+            vim.keymap.set("n", "<leader>lA", rt.code_action_group.code_action_group, { buffer = bufnr })
+            print("rust-tools attached")
+          end,
+          settings = {
+            ['rust-analyzer'] = {
+              cargo = {
+                features = "all"
+              },
+              checkOnSave = {
+                features = "all"
+              }
+            }
+          }
+        },
+      }
+    end,
+  },
 }
+-- Run :LvimReload
+
+lvim.builtin.telescope.pickers.find_files = {
+  find_command = {'rg','--files','--sort','path'}
+}
+
+local lspconfig = require("lspconfig")
+lspconfig.beancount.setup({
+  cmd = {
+       "/Users/ricardo/.asdf/installs/rust/1.72.0/bin/beancount-language-server",
+      "--stdio",
+  },
+  init_options = {
+      journal_file = "~/Sync/finances/main.beancount",
+  };
+})
+lspconfig.gleam.setup({
+});
 
 -- Autocommands (https://neovim.io/doc/user/autocmd.html)
 -- vim.api.nvim_create_autocmd("BufEnter", {
@@ -184,3 +318,38 @@ lvim.plugins = {
 --     require("nvim-treesitter.highlight").attach(0, "bash")
 --   end,
 -- })
+--
+
+-- DAP
+-- In Rust, the targets get managed by using :RustDebuggables
+-- This is just a convinience and can be deleted
+local dap = require('dap')
+dap.adapters.lldb = {
+  type = 'executable',
+  command = '/opt/homebrew/opt/llvm/bin/lldb-vscode', -- adjust as needed, must be absolute path
+  name = 'lldb'
+}
+dap.configurations.rust = {
+  {
+    name = 'Launch',
+    type = 'lldb',
+    request = 'launch',
+    program = vim.fn.getcwd() .. '/target/debug/' ..  vim.fn.fnamemodify(vim.fn.getcwd(), ':t'),
+    cwd = '${workspaceFolder}',
+    stopOnEntry = false,
+    args = {},
+  },
+}
+
+-- Custom Keybidings
+-- lvim.builtin.which_key.mappings["P"] = {
+lvim.builtin.which_key.mappings["t"] = {
+  name = "Test",
+  o = { "<cmd>lua require('neotest').output.open()<cr>", "Output" },
+  n = { "<cmd>lua require('neotest').run.run()<CR>", "Run" },
+  f = { "<cmd>lua require('neotest').run.run(vim.fn.expand('%'))<CR>", "Run current file" },
+  d = { "<cmd> lua require('neotest').run.run({strategy = 'dap'})<CR>", "Run and debug" },
+  s = { "<cmd>lua require('neotest').summary.toggle()<cr>", "Summary" },
+  w = { "<cmd>lua require('neotest').watch.toggle()<cr>", "Watch" }
+}
+lvim.builtin.project.patterns = { "mix.exs", "package.json", ".git"  }
