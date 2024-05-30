@@ -174,9 +174,23 @@ lvim.plugins = {
       require('monokai').setup {}
     end,
   },
+  {"norcalli/nvim-colorizer.lua",
+    config = function()
+    require("colorizer").setup({ "css", "scss", "html", "javascript" }, {
+        RGB = true, -- #RGB hex codes
+        RRGGBB = true, -- #RRGGBB hex codes
+        RRGGBBAA = true, -- #RRGGBBAA hex codes
+        rgb_fn = true, -- CSS rgb() and rgba() functions
+        hsl_fn = true, -- CSS hsl() and hsla() functions
+        css = true, -- Enable all CSS features: rgb_fn, hsl_fn, names, RGB, RRGGBB
+        css_fn = true, -- Enable all CSS *functions*: rgb_fn, hsl_fn
+        })
+    end,
+  },
   {"nvim-neotest/neotest",
     dependencies = {
       "nvim-lua/plenary.nvim",
+      "nvim-neotest/nvim-nio",
       "antoinemadec/FixCursorHold.nvim",
       "nvim-treesitter/nvim-treesitter",
       "jfpedroza/neotest-elixir"
@@ -196,9 +210,6 @@ lvim.plugins = {
     },
     event = 'VeryLazy',
     config = function()
-      -- Load treesitter grammar for org
-      require('orgmode').setup_ts_grammar()
-
       -- Setup treesitter
       require('nvim-treesitter.configs').setup({
         highlight = {
@@ -222,6 +233,7 @@ lvim.plugins = {
   },
   {'tpope/vim-fugitive'},
   {'tpope/vim-rhubarb'},
+  {'tpope/vim-abolish'},
   { "folke/trouble.nvim",
    dependencies = { "nvim-tree/nvim-web-devicons" },
    opts = {},

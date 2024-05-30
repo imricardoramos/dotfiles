@@ -79,6 +79,7 @@ if [ -z $TMUX_POWERLINE_LEFT_STATUS_SEGMENTS ]; then
 	TMUX_POWERLINE_LEFT_STATUS_SEGMENTS=(
 		"hostname 1 0" \
 		"tmux_session_info 2 234" \
+    "current_org_task" \
 		#"ifstat 30 255" \
 		#"ifstat_sys 30 255" \
 		#"lan_ip 24 255 ${TMUX_POWERLINE_SEPARATOR_RIGHT_THIN}" \

@@ -85,6 +85,9 @@ gpg-connect-agent updatestartuptty /bye >/dev/null
 # Java
 . ~/.asdf/plugins/java/set-java-home.zsh
 
+# Use direnv
+eval "$(direnv hook zsh)"
+
 # END PERSONAL STUFF
 
 # Aliases
@@ -92,7 +95,7 @@ alias cp="cp -i"                                                # Confirm before
 alias df='df -h'                                                # Human-readable sizes
 alias gitu='git add . && git commit && git push'
 alias vlc='vlc -I dummy'
-alias ls='exa'
+alias ls='eza'
 alias ll='ls -al --color=always'
 alias dc='docker-compose'
 alias vim='lvim'

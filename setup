@@ -1,12 +1,12 @@
 #!/bin/bash
 
-BASICS=(zsh git tmux stow curl mosh exa jq make cmake kitty-terminfo)
+BASICS=(zsh git tmux stow curl mosh eza jq make cmake kitty-terminfo gnupg doppler)
 BUILD_TOOLS=(make cmake build-essential libssl-dev zlib1g-dev libbz2-dev libreadline-dev libsqlite3-dev wget llvm \
   libncursesw5-dev xz-utils tk-dev libxml2-dev libxmlsec1-dev libffi-dev liblzma-dev pip)
-TMUX_TOOLS=(tmux-mem-cpu-load)
+#TMUX_TOOLS=(tmux-mem-cpu-load)
 # Do not install asdf's python-3.11.5 since it requires full compilation
 # some work is being done to make a standalone though: https://github.com/jdx/rtx/issues/559
-ASDF=(neovim-stable nodejs-20.5.1 rust-1.76.0)
+ASDF=(neovim-stable nodejs-latest rust-latest)
 STOW=(zsh git tmux lvim)
 # Do not install PERSONAL_TOOLS, they're just here for reference
 PERSONAL_TOOLS=(pass)
@@ -73,7 +73,7 @@ fi
 
 cecho "GREEN" "Installing tmux plugin manager"
 git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
-sudo apt -y install ${TMUX_TOOLS[@]}
+#sudo apt -y install ${TMUX_TOOLS[@]}
 
 cecho "GREEN" "Changing default shell to zsh"
 sudo chsh -s $(which zsh) $(whoami)
