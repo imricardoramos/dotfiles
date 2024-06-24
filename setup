@@ -1,13 +1,13 @@
 #!/bin/bash
 
-BASICS=(zsh git tmux stow curl mosh eza jq make cmake kitty-terminfo gnupg doppler)
+BASICS=(zsh git tmux stow curl mosh eza rbw jq make cmake kitty-terminfo gnupg doppler just)
 BUILD_TOOLS=(make cmake build-essential libssl-dev zlib1g-dev libbz2-dev libreadline-dev libsqlite3-dev wget llvm \
   libncursesw5-dev xz-utils tk-dev libxml2-dev libxmlsec1-dev libffi-dev liblzma-dev pip)
 #TMUX_TOOLS=(tmux-mem-cpu-load)
 # Do not install asdf's python-3.11.5 since it requires full compilation
 # some work is being done to make a standalone though: https://github.com/jdx/rtx/issues/559
 ASDF=(neovim-stable nodejs-latest rust-latest)
-STOW=(zsh git tmux lvim)
+STOW=(zsh git tmux nvim)
 # Do not install PERSONAL_TOOLS, they're just here for reference
 PERSONAL_TOOLS=(pass)
 

@@ -98,9 +98,10 @@ alias vlc='vlc -I dummy'
 alias ls='eza'
 alias ll='ls -al --color=always'
 alias dc='docker-compose'
-alias vim='lvim'
+alias vim='nvim'
 alias vimdiff='lvim -d'
 alias ag='ag --ignore-dir node_modules --ignore-dir .git --ignore-dir _build'
+alias pass='export BW_SESSION="$(bw unlock --raw)"'
 export PATH="/opt/homebrew/opt/llvm/bin:$PATH"
 
 # Completions
